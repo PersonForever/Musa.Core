@@ -35,7 +35,7 @@
   <PropertyGroup>
     <MusaCoreOnlyHeader>false</MusaCoreOnlyHeader>
   </PropertyGroup>
-  <Import Project="..\Publish\config\Musa.Core.Config.props" />
-  <Import Project="..\Publish\config\Musa.Core.Config.targets" />
+  <Import Project="..\Publish\Config\Musa.Core.Config.props" />
+  <Import Project="..\Publish\Config\Musa.Core.Config.targets" />
   <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Cpp.targets" />
 </Project>

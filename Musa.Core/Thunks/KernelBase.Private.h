@@ -1,5 +1,4 @@
-#pragma once
-
+﻿#pragma once
 
 namespace Musa
 {

@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Musa_Core_Include>$(Musa_Core_Root)\include</Musa_Core_Include>
-    <Musa_Core_Library>$(Musa_Core_Root)\lib\$(PlatformShortName)\$(Configuration)</Musa_Core_Library>
+    <Musa_Core_Include>$(Musa_Core_Root)\Include</Musa_Core_Include>
+    <Musa_Core_Library>$(Musa_Core_Root)\Library\$(Configuration)\$(Platform)</Musa_Core_Library>
   </PropertyGroup>
 
   <PropertyGroup>

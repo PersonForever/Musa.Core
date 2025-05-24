@@ -1,10 +1,9 @@
-// unnecessary, fix ReSharper's code analysis.
+﻿// unnecessary, fix ReSharper's code analysis.
 #pragma warning(suppress: 4117)
 #define _KERNEL_MODE 1
 
 #include <Veil.h>
 #include <Musa.Core/Musa.Core.h>
-
 
 // Logging
 #ifdef _DEBUG
@@ -14,16 +13,13 @@
 #define MusaLOG(...)
 #endif
 
-
 EXTERN_C DRIVER_INITIALIZE DriverEntry;
 EXTERN_C DRIVER_UNLOAD     DriverUnload;
-
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text(INIT, DriverEntry)
 #pragma alloc_text(PAGE, DriverUnload)
 #endif
-
 
 namespace Main
 {
@@ -53,7 +49,7 @@ namespace Main
         do {
             DriverObject->DriverUnload = Main::DriverUnload;
 
-            Status = MusaCoreStartup(DriverObject, RegistryPath);
+            Status = MusaCoreStartup(DriverObject, RegistryPath, true);
             if (!NT_SUCCESS(Status)) {
                 break;
             }

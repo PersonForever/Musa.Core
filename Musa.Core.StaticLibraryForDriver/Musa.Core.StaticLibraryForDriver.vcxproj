@@ -29,89 +29,72 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup>
-    <PostBuildEvent>
-      <Command>@echo off
-xcopy /v /f /d /y "$(SolutionDir)\LICENSE" "$(SolutionDir)\Publish\"
-xcopy /v /f /d /y "$(SolutionDir)\README.md" "$(SolutionDir)\Publish\"
-xcopy /v /f /d /y "$(SolutionDir)\Musa.Core\Musa.Core.h" "$(SolutionDir)\Publish\include\"
-xcopy /v /f /d /y "$(SolutionDir)\Musa.Core.NuGet\Musa.Core.Config.props" "$(SolutionDir)\Publish\config\"
-xcopy /v /f /d /y "$(SolutionDir)\Musa.Core.NuGet\Musa.Core.Config.targets" "$(SolutionDir)\Publish\config\"
-xcopy /v /f /d /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)\Publish\lib\$(PlatformShortName)\$(Configuration)\"
-xcopy /v /f /d /y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)\Publish\lib\$(PlatformShortName)\$(Configuration)\"
-echo F | xcopy /v /f /d /y "$(IntDirFullPath)Musa.Core.SystemCall.Stubs.obj" "$(SolutionDir)\Publish\lib\$(PlatformShortName)\$(Configuration)\Musa.Core.SystemCallForDriver.Stubs.obj"</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
+  <Target Name="CustomPublish" AfterTargets="Build">
+    <ItemGroup>
+      <MusaCoreLiteLicense Include="$(SolutionDir)LICENSE" />
+      <MusaCoreLiteLicense Include="$(SolutionDir)README.md" />
+      <MusaCoreLiteHeaders Include="$(SourcesDirectory)Musa.Core.h" />
+      <MusaCoreLiteProduct Include="$(OutDir)$(TargetName).lib" />
+      <MusaCoreLiteProduct Include="$(OutDir)$(TargetName).pdb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(MusaCoreLiteLicense)" DestinationFolder="$(PublishDirectory)" />
+    <Copy SourceFiles="@(MusaCoreLiteHeaders)" DestinationFolder="$(PublishDirectory)Include" />
+    <Copy SourceFiles="@(MusaCoreLiteProduct)" DestinationFolder="$(PublishDirectory)Library\$(Configuration)\$(Platform)" />
+  </Target>
   <ItemGroup>
-    <ClInclude Include="..\Musa.Core\Musa.Core.h" />
-    <ClInclude Include="..\Musa.Core\Musa.Core.PEParser.h" />
-    <ClInclude Include="..\Musa.Core\Musa.Core.SystemCall.h" />
-    <ClInclude Include="..\Musa.Core\Musa.Core.SystemEnvironmentBlock.h" />
-    <ClInclude Include="..\Musa.Core\Musa.Core.SystemEnvironmentBlock.Private.h" />
-    <ClInclude Include="..\Musa.Core\Musa.Core.SystemEnvironmentBlock.Process.h" />
-    <ClInclude Include="..\Musa.Core\Musa.Core.SystemEnvironmentBlock.Thread.h" />
-    <ClInclude Include="..\Musa.Core\Musa.Core.Utility.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\KernelBase.FileVersion.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\KernelBase.Handle.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\KernelBase.LibraryLoader.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\KernelBase.NLS.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\KernelBase.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\KernelBase.Process.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\KernelBase.Synchronize.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\KernelBase.System.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\KernelBase.Thread.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\Ntdll.Debug.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\Ntdll.FiberLocalStorage.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\Ntdll.Heap.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\Ntdll.Image.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\Ntdll.LibraryLoader.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\Ntdll.RealTime.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\Ntdll.Synchronize.Private.h" />
-    <ClInclude Include="..\Musa.Core\Thunks\Ntdll.Thread.Private.h" />
+    <ClInclude Include="$(SourcesDirectory)Musa.Core.h" />
+    <ClInclude Include="$(SourcesDirectory)Musa.Core.SystemEnvironmentBlock.h" />
+    <ClInclude Include="$(SourcesDirectory)Musa.Core.SystemEnvironmentBlock.Process.h" />
+    <ClInclude Include="$(SourcesDirectory)Musa.Core.SystemEnvironmentBlock.Thread.h" />
+    <ClInclude Include="$(SourcesDirectory)Musa.Core.SystemEnvironmentBlock.Fls.h" />
+    <ClInclude Include="$(SourcesDirectory)Musa.Utilities.h" />
+    <ClInclude Include="$(SourcesDirectory)Musa.Utilities.PEParser.h" />
+    <ClInclude Include="$(SourcesDirectory)Thunks\KernelBase.Private.h" />
     <ClInclude Include="universal.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Musa.Core\Musa.Core.cpp" />
-    <ClCompile Include="..\Musa.Core\Musa.Core.Nothing.cpp">
+    <ClCompile Include="$(SourcesDirectory)Musa.Core.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Musa.Core.Nothing.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\Musa.Core\Musa.Core.PEParser.cpp" />
-    <ClCompile Include="..\Musa.Core\Musa.Core.SystemCall.cpp" />
-    <ClCompile Include="..\Musa.Core\Musa.Core.SystemCall.Stubs.cpp" />
-    <ClCompile Include="..\Musa.Core\Musa.Core.SystemEnvironmentBlock.cpp" />
-    <ClCompile Include="..\Musa.Core\Musa.Core.SystemEnvironmentBlock.Process.cpp" />
-    <ClCompile Include="..\Musa.Core\Musa.Core.SystemEnvironmentBlock.Thread.cpp" />
-    <ClCompile Include="..\Musa.Core\Musa.Core.Utility.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.Debug.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.Error.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.FiberLocalStorage.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.FileVersion.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.Handle.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.Heap.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.LibraryLoader.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.NLS.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.PerformanceCounter.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.Private.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.Process.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.RealTime.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.Synchronize.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.System.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.Thread.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.ThreadLocalStorage.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\KernelBase.Utility.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.Debug.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.Error.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.FiberLocalStorage.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.Heap.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.Image.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.LibraryLoader.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.PerformanceCounter.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.Pool.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.RealTime.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.Synchronize.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.System.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.Thread.cpp" />
-    <ClCompile Include="..\Musa.Core\Thunks\Ntdll.Utility.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Musa.Core.SystemEnvironmentBlock.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Musa.Core.SystemEnvironmentBlock.Process.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Musa.Core.SystemEnvironmentBlock.Thread.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Musa.Core.SystemEnvironmentBlock.Fls.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Musa.Utilities.Overlay.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.Debug.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.Error.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.FiberLocalStorage.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.FileVersion.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.Handle.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.Heap.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.LibraryLoader.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.NLS.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.PerformanceCounter.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.Private.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.Process.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.RealTime.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.Synchronize.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.System.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.Thread.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.ThreadLocalStorage.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\KernelBase.Utility.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.Debug.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.Error.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.FiberLocalStorage.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.Heap.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.Image.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.LibraryLoader.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.PerformanceCounter.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.Pool.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.RealTime.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.Synchronize.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.System.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.Thread.cpp" />
+    <ClCompile Include="$(SourcesDirectory)Thunks\Ntdll.Utility.cpp" />
   </ItemGroup>
+  <PropertyGroup>
+    <MusaCoreOnlyHeader>true</MusaCoreOnlyHeader>
+  </PropertyGroup>
   <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Cpp.targets" />
 </Project>

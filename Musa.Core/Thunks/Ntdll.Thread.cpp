@@ -1,27 +1,23 @@
-#include "Ntdll.Thread.Private.h"
-
+﻿#include "Internal/Ntdll.Thread.h"
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text(PAGE, MUSA_NAME(RtlExitUserThread))
 #endif
 
 EXTERN_C_START
-namespace Musa
+
+#if defined(_KERNEL_MODE)
+
+_IRQL_requires_max_(PASSIVE_LEVEL)
+VOID NTAPI MUSA_NAME(RtlExitUserThread)(_In_ NTSTATUS ExitStatus)
 {
+    PAGED_CODE();
 
-#ifdef _KERNEL_MODE
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    VOID NTAPI MUSA_NAME(RtlExitUserThread)(
-        _In_ NTSTATUS ExitStatus
-        )
-    {
-        PAGED_CODE();
+    (void)PsTerminateSystemThread(ExitStatus);
+}
 
-        (void)PsTerminateSystemThread(ExitStatus);
-    }
-    MUSA_IAT_SYMBOL(RtlExitUserThread, 4);
+MUSA_IAT_SYMBOL(RtlExitUserThread, 4);
+
 #endif
 
-
-}
 EXTERN_C_END

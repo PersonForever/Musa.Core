@@ -1,50 +1,19 @@
-#include "Musa.Core.Utility.h"
+﻿#include "Musa.Utilities.h"
 
+#if defined(_KERNEL_MODE)
 
-namespace Musa
+namespace Musa::Utils
 {
-#ifdef _KERNEL_MODE
-    PVOID MUSA_API GetLoadedModuleBase(_In_ PCUNICODE_STRING ModuleName)
-    {
-        PVOID ModuleBase = nullptr;
-
-        /* Lock the list */
-        ExEnterCriticalRegionAndAcquireResourceShared(PsLoadedModuleResource);
-        {
-            /* Loop the loaded module list */
-            for (LIST_ENTRY const* NextEntry = PsLoadedModuleList->Flink; NextEntry != PsLoadedModuleList;)
-            {
-                /* Get the entry */
-                const auto LdrEntry = CONTAINING_RECORD(NextEntry, KLDR_DATA_TABLE_ENTRY, InLoadOrderLinks);
-
-                /* Check if it's the module */
-                if (RtlEqualUnicodeString(ModuleName, &LdrEntry->BaseDllName, TRUE))
-                {
-                    /* Found it */
-                    ModuleBase = LdrEntry->DllBase;
-                    break;
-                }
-
-                /* Keep looping */
-                NextEntry = NextEntry->Flink;
-            }
-        }
-        /* Release the lock */
-        ExReleaseResourceAndLeaveCriticalRegion(PsLoadedModuleResource);
-
-        return ModuleBase;
-    }
-
     NTSTATUS MUSA_API RunTaskOnLowIrql(
         _In_ PDRIVER_OBJECT  DriverObject,
         _In_ PCTASK_FUNCTION Task,
-        _In_opt_ PVOID Context
+        _In_opt_ PVOID       Context
     )
     {
         VEIL_DECLARE_STRUCT(TASK_ITEM)
         {
-            KEVENT          WaitEvent;
-            NTSTATUS        Status;
+            KEVENT   WaitEvent;
+            NTSTATUS Status;
 
             PCTASK_FUNCTION Task;
             PVOID           Context;
@@ -82,7 +51,6 @@ namespace Musa
 
                         KeSetEvent(&Item->WaitEvent, IO_NO_INCREMENT, FALSE);
                     }
-
                 }, DelayedWorkQueue, TaskItem);
 
                 Status = KeWaitForSingleObject(&TaskItem->WaitEvent, Executive, KernelMode, FALSE, nullptr);
@@ -91,10 +59,9 @@ namespace Musa
                 }
 
                 ExFreePoolWithTag(TaskItem, MUSA_TAG);
-            }
-            else {
-            #pragma warning(push)
-            #pragma warning(disable: 4996)
+            } else {
+                #pragma warning(push)
+                #pragma warning(disable: 4996)
                 const auto TaskItem = static_cast<PTASK_ITEM>(ExAllocatePoolZero(
                     NonPagedPool, sizeof(TASK_ITEM) + sizeof(WORK_QUEUE_ITEM), MUSA_TAG));
                 if (TaskItem == nullptr) {
@@ -116,7 +83,6 @@ namespace Musa
 
                         KeSetEvent(&Item->WaitEvent, IO_NO_INCREMENT, FALSE);
                     }
-
                 }, TaskItem);
 
                 ExQueueWorkItem(IoWorkItem, DelayedWorkQueue);
@@ -127,13 +93,12 @@ namespace Musa
                 }
 
                 ExFreePoolWithTag(TaskItem, MUSA_TAG);
-            #pragma warning(pop)
+                #pragma warning(pop)
             }
-
         } while (false);
 
         return Status;
     }
-
-#endif
 }
+
+#endif // defined(_KERNEL_MODE)

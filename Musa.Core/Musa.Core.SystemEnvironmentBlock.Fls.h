@@ -1,11 +1,13 @@
-#pragma once
-#ifdef _KERNEL_MODE
+﻿#pragma once
 
+#if defined(_KERNEL_MODE)
 
-// Fiber Local storage
-
-namespace Musa
+namespace Musa::Core
 {
+    //
+    // Fiber Local storage
+    //
+
     constexpr auto RTL_FLS_MAXIMUM_AVAILABLE = 256 - (sizeof(LIST_ENTRY) / sizeof(PVOID));
 
     VEIL_DECLARE_STRUCT(RTL_FLS_DATA)
@@ -23,31 +25,23 @@ namespace Musa
         ULONG                   FlsBitmapBits[ROUND_TO_SIZE(RTL_FLS_MAXIMUM_AVAILABLE, sizeof(PVOID)) / RTL_BITS_OF(ULONG)];
         ULONG                   FlsHighIndex;
     };
-
 }
+
 
 EXTERN_C_START
 
+_IRQL_requires_max_(APC_LEVEL)
+VOID NTAPI MUSA_NAME_PRIVATE(FlsCreate)();
 
 _IRQL_requires_max_(APC_LEVEL)
-VOID NTAPI MUSA_NAME_PRIVATE(RtlFlsCreate)();
+VOID NTAPI MUSA_NAME_PRIVATE(FlsCleanup)();
 
 _IRQL_requires_max_(APC_LEVEL)
-VOID NTAPI MUSA_NAME_PRIVATE(RtlFlsCleanup)();
-
-_IRQL_requires_max_(APC_LEVEL)
-VOID NTAPI MUSA_NAME_PRIVATE(RtlFlsDataCleanup)(
-    _In_ Musa::PRTL_FLS_DATA FlsData,
-    _In_ ULONG Flags
-    );
-
-_IRQL_requires_max_(APC_LEVEL)
-VOID NTAPI MUSA_NAME(RtlProcessFlsData)(
+VOID NTAPI MUSA_NAME_PRIVATE(FlsDataCleanup)(
     _In_ PVOID FlsData,
     _In_ ULONG Flags
     );
 
 EXTERN_C_END
 
-
-#endif // _KERNEL_MODE
+#endif // defined(_KERNEL_MODE)

@@ -19,13 +19,11 @@
 #include <string.h>
 
 // Local  Header
+#include <Musa.CoreLite.h>
 #include "Musa.Core/Musa.Core.h"
 
 // Global Variable
-EXTERN_C_START
-extern uintptr_t __security_cookie;
 constexpr unsigned long MUSA_TAG = '-iM-';
-EXTERN_C_END
 
 // Global Macro
 #define MUSA_NAME_PUBLIC(name)  _VEIL_CONCATENATE(_Musa_, name)
@@ -33,7 +31,7 @@ EXTERN_C_END
 #define MUSA_NAME MUSA_NAME_PUBLIC
 
 #if defined _M_IX86
-#define MUSA_IAT_SYMBOL(name, stack) _VEIL_DEFINE_IAT_RAW_SYMBOL(name ## @ ## stack, MUSA_NAME(name))
+#define MUSA_IAT_SYMBOL(name, stack) _VEIL_DEFINE_IAT_RAW_SYMBOL(_VEIL_CONCATENATE(_VEIL_CONCATENATE(name,@),stack), MUSA_NAME(name))
 #else
 #define MUSA_IAT_SYMBOL(name, stack) _VEIL_DEFINE_IAT_SYMBOL(name, MUSA_NAME(name))
 #endif

@@ -1,9 +1,6 @@
-#pragma once
-#ifdef _KERNEL_MODE
-
+﻿#pragma once
 
 EXTERN_C_START
-
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 BOOL WINAPI MUSA_NAME(GetLogicalProcessorInformation)(
@@ -35,8 +32,4 @@ VOID WINAPI MUSA_NAME(GetSystemInfo)(
     _Out_ LPSYSTEM_INFO SystemInfo
     );
 
-
 EXTERN_C_END
-
-
-#endif

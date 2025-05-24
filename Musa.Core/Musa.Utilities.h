@@ -1,7 +1,8 @@
-#pragma once
+﻿#pragma once
 
+EXTERN_C uintptr_t __security_cookie;
 
-namespace Musa
+namespace Musa::Utils
 {
     // type traits
     template <class, class>
@@ -40,15 +41,15 @@ namespace Musa
     {
 #if defined(_WIN64)
         constexpr size_t FnvOffsetBasis = 14695981039346656037ULL;
-        constexpr size_t FnvPrime       = 1099511628211ULL;
+        constexpr size_t FnvPrime = 1099511628211ULL;
 #else
         constexpr size_t FnvOffsetBasis = 2166136261U;
-        constexpr size_t FnvPrime       = 16777619U;
+        constexpr size_t FnvPrime = 16777619U;
 #endif
 
         auto Value = FnvOffsetBasis;
-        for (size_t Idx = 0; Idx < Count; ++Idx) {
-            Value ^= static_cast<size_t>(Buffer[Idx]);
+        for (size_t idx = 0; idx < Count; ++idx) {
+            Value ^= static_cast<size_t>(Buffer[idx]);
             Value *= FnvPrime;
         }
         return Value;
@@ -60,20 +61,32 @@ namespace Musa
         return Fnv1aHash(Buffer, Size - _countof(""));
     }
 
+    NTSTATUS MUSA_API GetLoadedModuleBase(
+        _Out_ PVOID* ModuleBase,
+        _In_  PCWSTR ModuleName
+    );
+
+    NTSTATUS MUSA_API GetKnownDllSectionHandle(
+        _Out_ HANDLE* SectionHandle,
+        _In_  PCWSTR  DllName,
+        _In_  ACCESS_MASK DesiredAccess
+    );
+
+    NTSTATUS MUSA_API RemapSectionView(
+        _Inout_ HANDLE* SectionHandle,
+        _In_    PVOID* ViewBase,
+        _In_    SIZE_T* ViewSize
+    );
+
 #ifdef _KERNEL_MODE
-    PVOID MUSA_API GetLoadedModuleBase(
-        _In_ PCUNICODE_STRING ModuleName
-    );
-
     typedef
-    _IRQL_requires_max_(APC_LEVEL)
-    _Function_class_(TASK_FUNCTION)
-    NTSTATUS
-    CALLBACK
-    TASK_FUNCTION(
-        _In_opt_ PVOID Context
-    );
-
+        _IRQL_requires_max_(APC_LEVEL)
+        _Function_class_(TASK_FUNCTION)
+        NTSTATUS
+        CALLBACK
+        TASK_FUNCTION(
+            _In_opt_ PVOID Context
+        );
     typedef TASK_FUNCTION* PCTASK_FUNCTION;
 
     NTSTATUS MUSA_API RunTaskOnLowIrql(

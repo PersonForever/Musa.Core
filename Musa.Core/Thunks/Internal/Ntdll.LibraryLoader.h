@@ -1,7 +1,4 @@
-#pragma once
-
-
-#ifdef _KERNEL_MODE
+﻿#pragma once
 
 EXTERN_C_START
 
@@ -88,7 +85,7 @@ NTSTATUS NTAPI MUSA_NAME(LdrGetKnownDllSectionHandle)(
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS NTAPI MUSA_NAME(LdrLoadDataFile)(
-    _In_  PCWSTR DllName,
+    _In_ PCWSTR  DllName,
     _Out_ PVOID* DllHandle
     );
 
@@ -97,8 +94,4 @@ NTSTATUS NTAPI MUSA_NAME(LdrUnloadDataFile)(
     _In_ PVOID DllHandle
     );
 
-
-
 EXTERN_C_END
-
-#endif

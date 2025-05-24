@@ -1,7 +1,5 @@
-#include "Musa.Core.h"
+﻿#include "Musa.Core.h"
 #include "Musa.Core.SystemEnvironmentBlock.h"
-#include "Musa.Core.SystemCall.h"
-
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text(INIT, MusaCoreStartup)
@@ -10,104 +8,100 @@
 
 EXTERN_C_START
 
-extern PVOID PsSystemDllBase = nullptr;
+#if defined(_KERNEL_MODE)
+bool MusaCoreUseThreadNotifyCallback = false;
 
-namespace Musa
+NTSTATUS MUSA_API MusaCoreStartup(
+    _In_ PDRIVER_OBJECT  DriverObject,
+    _In_ PUNICODE_STRING RegistryPath,
+    _In_ BOOL TLSWithThreadNotifyCallback
+)
 {
-#ifdef _KERNEL_MODE
-    NTSTATUS MUSA_API MusaCoreStartup(
-        _In_ PDRIVER_OBJECT  DriverObject,
-        _In_ PUNICODE_STRING RegistryPath
-    )
-    {
-        UNREFERENCED_PARAMETER(DriverObject);
-        UNREFERENCED_PARAMETER(RegistryPath);
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(RegistryPath);
 
-        PAGED_CODE();
+    PAGED_CODE();
 
-        NTSTATUS Status;
+    NTSTATUS Status;
 
-        do {
-            Status = MUSA_NAME_PRIVATE(SetupEnvironmentBlock)(DriverObject, RegistryPath);
-            if (!NT_SUCCESS(Status)) {
-                break;
-            }
+    do {
+        MusaCoreUseThreadNotifyCallback = !!TLSWithThreadNotifyCallback;
 
-            Status = MUSA_NAME_PRIVATE(SetupSystemCall)();
-            if (!NT_SUCCESS(Status)) {
-                break;
-            }
-
-        } while (false);
-
+        Status = MusaCoreLiteStartup();
         if (!NT_SUCCESS(Status)) {
-            (void)MusaCoreShutdown();
+            MusaLOG("MusaCoreLiteStartup failed: 0x%X", Status);
+            break;
         }
 
-        return Status;
-    }
-
-#else // !_KERNEL_MODE
-
-    NTSTATUS MUSA_API MusaCoreStartup()
-    {
-        NTSTATUS Status;
-
-        do {
-            Status = MUSA_NAME_PRIVATE(SetupEnvironmentBlock)();
-            if (!NT_SUCCESS(Status)) {
-                break;
-            }
-
-            Status = MUSA_NAME_PRIVATE(SetupSystemCall)();
-            if (!NT_SUCCESS(Status)) {
-                break;
-            }
-
-        } while (false);
-
+        Status = MUSA_NAME_PRIVATE(EnvironmentBlockSetup)(DriverObject, RegistryPath);
         if (!NT_SUCCESS(Status)) {
-            (void)MusaCoreShutdown();
+            MusaLOG("SetupEnvironmentBlock failed: 0x%X", Status);
+            break;
         }
 
-        return Status;
+    } while (false);
+
+    if (!NT_SUCCESS(Status)) {
+        (void)MusaCoreShutdown();
     }
 
-#endif // !_KERNEL_MODE
-
-    NTSTATUS MUSA_API MusaCoreShutdown()
-    {
-        PAGED_CODE();
-
-        NTSTATUS Status;
-
-        do {
-            Status = MUSA_NAME_PRIVATE(FreeSystemCall)();
-            if (!NT_SUCCESS(Status)) {
-                break;
-            }
-
-            Status = MUSA_NAME_PRIVATE(FreeEnvironmentBlock)();
-            if (!NT_SUCCESS(Status)) {
-                break;
-            }
-
-        } while (false);
-
-        return Status;
-    }
-
-    PVOID MUSA_API MusaCoreGetSystemRoutine(
-        _In_z_ const char* Name
-    )
-    {
-        return MUSA_NAME_PRIVATE(GetSystemRoutineAddress)(Name);
-    }
-
-    PVOID MUSA_API MusaCoreGetSystemRoutineByNameHash(const size_t NameHash)
-    {
-        return MUSA_NAME_PRIVATE(GetSystemRoutineAddressByNameHash)(NameHash);
-    }
-
+    return Status;
 }
+#endif // defined(_KERNEL_MODE)
+
+#if !defined(_KERNEL_MODE)
+NTSTATUS MUSA_API MusaCoreStartup()
+{
+    NTSTATUS Status;
+
+    do {
+        Status = MusaCoreLiteStartup();
+        if (!NT_SUCCESS(Status)) {
+            MusaLOG("MusaCoreLiteStartup failed: 0x%X", Status);
+            break;
+        }
+
+        Status = MUSA_NAME_PRIVATE(EnvironmentBlockSetup)();
+        if (!NT_SUCCESS(Status)) {
+            MusaLOG("SetupEnvironmentBlock failed: 0x%X", Status);
+            break;
+        }
+
+        MusaLOG("MusaCore initialized successfully");
+    } while (false);
+
+    if (!NT_SUCCESS(Status)) {
+        (void)MusaCoreShutdown();
+    }
+
+    return Status;
+}
+#endif // !defined(_KERNEL_MODE)
+
+
+NTSTATUS MUSA_API MusaCoreShutdown()
+{
+    PAGED_CODE();
+
+    NTSTATUS Status;
+
+    do {
+        Status = MUSA_NAME_PRIVATE(EnvironmentBlockTeardown)();
+        if (!NT_SUCCESS(Status)) {
+            MusaLOG("FreeEnvironmentBlock failed: 0x%X", Status);
+            break;
+        }
+
+        Status = MusaCoreLiteShutdown();
+        if (!NT_SUCCESS(Status)) {
+            MusaLOG("MusaCoreLiteShutdown failed: 0x%X", Status);
+            break;
+        }
+
+        MusaLOG("MusaCore shutdown successfully");
+    } while (false);
+
+    return Status;
+}
+
 EXTERN_C_END

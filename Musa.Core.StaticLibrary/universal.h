@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #pragma warning(disable: 6101)
 
 // Config Macro
@@ -15,13 +15,11 @@
 #include <string.h>
 
 // Local  Header
+#include <Musa.CoreLite.h>
 #include "Musa.Core/Musa.Core.h"
 
 // Global Variable
-EXTERN_C_START
-extern uintptr_t __security_cookie;
 constexpr unsigned long MUSA_TAG = 'asuM';
-EXTERN_C_END
 
 // Global Macro
 #define MUSA_NAME_PUBLIC(name)  _VEIL_CONCATENATE(_Musa_, name)
@@ -34,8 +32,8 @@ EXTERN_C_END
 #define MUSA_IAT_SYMBOL(name, stack) _VEIL_DEFINE_IAT_SYMBOL(name, MUSA_NAME(name))
 #endif
 
-#define PAGED_CODE()        NOP_FUNCTION;
-#define PAGED_CODE_LOCKED() NOP_FUNCTION;
+#define PAGED_CODE()        NOP_FUNCTION
+#define PAGED_CODE_LOCKED() NOP_FUNCTION
 
 // Logging
 #ifdef _DEBUG

@@ -1,13 +1,10 @@
-#pragma once
-#ifdef _KERNEL_MODE
-
+﻿#pragma once
 
 EXTERN_C_START
 
-
 _IRQL_requires_max_(PASSIVE_LEVEL)
 BOOL WINAPI MUSA_NAME(GetProcessTimes)(
-    _In_  HANDLE     ProcessHandle,
+    _In_ HANDLE      ProcessHandle,
     _Out_ LPFILETIME CreationTime,
     _Out_ LPFILETIME ExitTime,
     _Out_ LPFILETIME KernelTime,
@@ -22,7 +19,7 @@ BOOL WINAPI MUSA_NAME(TerminateProcess)(
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 BOOL WINAPI MUSA_NAME(GetExitCodeProcess)(
-    _In_  HANDLE  ProcessHandle,
+    _In_ HANDLE   ProcessHandle,
     _Out_ LPDWORD ExitCode
     );
 
@@ -33,8 +30,8 @@ DWORD WINAPI MUSA_NAME(GetProcessVersion)(
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 BOOL WINAPI MUSA_NAME(OpenProcessToken)(
-    _In_ HANDLE ProcessHandle,
-    _In_ DWORD DesiredAccess,
+    _In_ HANDLE      ProcessHandle,
+    _In_ DWORD       DesiredAccess,
     _Outptr_ PHANDLE TokenHandle
     );
 
@@ -51,7 +48,7 @@ BOOL WINAPI MUSA_NAME(GetPriorityClass)(
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 BOOL WINAPI MUSA_NAME(ProcessIdToSessionId)(
-    _In_  DWORD  ProcessId,
+    _In_ DWORD   ProcessId,
     _Out_ DWORD* SessionId
     );
 
@@ -62,13 +59,13 @@ DWORD WINAPI MUSA_NAME(GetProcessId)(
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 BOOL WINAPI MUSA_NAME(FlushInstructionCache)(
-    _In_ HANDLE ProcessHandle,
+    _In_ HANDLE                        ProcessHandle,
     _In_reads_bytes_opt_(Size) LPCVOID BaseAddress,
-    _In_ SIZE_T Size
+    _In_ SIZE_T                        Size
     );
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
-VOID WINAPI MUSA_NAME(FlushProcessWriteBuffers)();
+VOID WINAPI MUSA_NAME(FlushProcessWriteBuffers)(VOID);
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 DWORD WINAPI MUSA_NAME(GetProcessIdOfThread)(
@@ -84,14 +81,14 @@ HANDLE WINAPI MUSA_NAME(OpenProcess)(
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 BOOL WINAPI MUSA_NAME(GetProcessHandleCount)(
-    _In_  HANDLE ProcessHandle,
+    _In_ HANDLE  ProcessHandle,
     _Out_ PDWORD HandleCount
     );
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 BOOL WINAPI MUSA_NAME(GetProcessPriorityBoost)(
-    _In_  HANDLE ProcessHandle,
-    _Out_ PBOOL  DisablePriorityBoost
+    _In_ HANDLE ProcessHandle,
+    _Out_ PBOOL DisablePriorityBoost
     );
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
@@ -108,22 +105,18 @@ BOOL WINAPI MUSA_NAME(IsProcessCritical)(
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 BOOL WINAPI MUSA_NAME(SetProcessInformation)(
-    _In_ HANDLE ProcessHandle,
-    _In_ PROCESS_INFORMATION_CLASS ProcessInformationClass,
+    _In_ HANDLE                                     ProcessHandle,
+    _In_ PROCESS_INFORMATION_CLASS                  ProcessInformationClass,
     _In_reads_bytes_(ProcessInformationSize) LPVOID ProcessInformation,
-    _In_ DWORD ProcessInformationSize
+    _In_ DWORD                                      ProcessInformationSize
     );
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
 BOOL WINAPI MUSA_NAME(GetProcessInformation)(
-    _In_ HANDLE ProcessHandle,
-    _In_ PROCESS_INFORMATION_CLASS ProcessInformationClass,
+    _In_ HANDLE                                       ProcessHandle,
+    _In_ PROCESS_INFORMATION_CLASS                    ProcessInformationClass,
     _Out_writes_bytes_(ProcessInformationSize) LPVOID ProcessInformation,
-    _In_ DWORD ProcessInformationSize
+    _In_ DWORD                                        ProcessInformationSize
     );
 
-
 EXTERN_C_END
-
-
-#endif

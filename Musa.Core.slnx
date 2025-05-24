@@ -1,0 +1,18 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/ReadMe/">
+    <File Path="README.md" />
+    <File Path="README.zh-CN.md" />
+  </Folder>
+  <Project Path="Musa.Core.StaticLibraryForDriver/Musa.Core.StaticLibraryForDriver.vcxproj" Id="15951923-1854-4cae-adca-e3897aee39a0">
+    <Build Solution="*|x86" Project="false" />
+  </Project>
+  <Project Path="Musa.Core.TestForDriver/Musa.Core.TestForDriver.vcxproj" Id="5201b67c-252e-49f7-a368-fec89899392a">
+    <BuildDependency Project="Musa.Core.StaticLibraryForDriver/Musa.Core.StaticLibraryForDriver.vcxproj" />
+    <Build Solution="*|x86" Project="false" />
+  </Project>
+</Solution>
