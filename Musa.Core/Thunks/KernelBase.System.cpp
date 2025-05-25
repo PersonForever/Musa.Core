@@ -7,6 +7,7 @@
 #pragma alloc_text(PAGE, MUSA_NAME(GetSystemTimes))
 #pragma alloc_text(PAGE, MUSA_NAME(GetNativeSystemInfo))
 #pragma alloc_text(PAGE, MUSA_NAME(GetSystemInfo))
+#pragma alloc_text(PAGE, MUSA_NAME(VerifyVersionInfoW))
 #endif
 
 EXTERN_C_START
@@ -273,8 +274,8 @@ BOOL WINAPI MUSA_NAME(GetSystemTimes)(
         const auto NumberOfProcessors   = BaseInformation.NumberOfProcessors;
         const auto SizeOfProcessorTimes = NumberOfProcessors * sizeof(*ProcessorTimes);
 
-        ProcessorTimes = static_cast<PSYSTEM_PROCESSOR_PERFORMANCE_INFORMATION>(RtlAllocateHeap(
-            GetProcessHeap(), HEAP_ZERO_MEMORY, SizeOfProcessorTimes));
+        ProcessorTimes = static_cast<PSYSTEM_PROCESSOR_PERFORMANCE_INFORMATION>(
+            LocalAlloc(LPTR, SizeOfProcessorTimes));
         if (ProcessorTimes == nullptr) {
             Status = STATUS_NO_MEMORY;
             break;
@@ -317,7 +318,7 @@ BOOL WINAPI MUSA_NAME(GetSystemTimes)(
     } while (false);
 
     if (ProcessorTimes) {
-        RtlFreeHeap(GetProcessHeap(), 0, ProcessorTimes);
+        LocalFree(ProcessorTimes);
     }
 
     if (!NT_SUCCESS(Status)) {
@@ -417,5 +418,19 @@ VOID WINAPI MUSA_NAME(GetSystemInfo)(
 }
 
 MUSA_IAT_SYMBOL(GetSystemInfo, 4);
+
+_IRQL_requires_max_(PASSIVE_LEVEL)
+BOOL WINAPI MUSA_NAME(VerifyVersionInfoW)(
+    _Inout_ LPOSVERSIONINFOEXW lpVersionInformation,
+    _In_    DWORD dwTypeMask,
+    _In_    DWORDLONG dwlConditionMask
+)
+{
+    PAGED_CODE();
+
+    return RtlVerifyVersionInfo(lpVersionInformation, dwTypeMask, dwlConditionMask) == STATUS_SUCCESS;
+}
+
+MUSA_IAT_SYMBOL(VerifyVersionInfoW, 12);
 
 EXTERN_C_END

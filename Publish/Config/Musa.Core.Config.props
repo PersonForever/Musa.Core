@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- \Musa.Core\config\..\ -->
+    <!-- \Musa.Core\Config\..\ -->
     <Musa_Core_Root>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)\..'))</Musa_Core_Root>
   </PropertyGroup>
 

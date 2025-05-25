@@ -32,4 +32,11 @@ VOID WINAPI MUSA_NAME(GetSystemInfo)(
     _Out_ LPSYSTEM_INFO SystemInfo
     );
 
+_IRQL_requires_max_(PASSIVE_LEVEL)
+BOOL WINAPI MUSA_NAME(VerifyVersionInfoW)(
+    _Inout_ LPOSVERSIONINFOEXW lpVersionInformation,
+    _In_    DWORD dwTypeMask,
+    _In_    DWORDLONG dwlConditionMask
+    );
+
 EXTERN_C_END

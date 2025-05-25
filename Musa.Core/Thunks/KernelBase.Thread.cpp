@@ -892,11 +892,10 @@ HRESULT WINAPI MUSA_NAME(GetThreadDescription)(
 
     do {
         PTHREAD_NAME_INFORMATION Information;
-        ULONG                    Length = sizeof(THREAD_NAME_INFORMATION) + 128;
+        ULONG Length = sizeof(THREAD_NAME_INFORMATION) + 128;
 
         for (;; Length += sizeof(UNICODE_NULL)) {
-            Information = static_cast<PTHREAD_NAME_INFORMATION>(
-                RtlAllocateHeap(GetProcessHeap(), 0, Length));
+            Information = static_cast<PTHREAD_NAME_INFORMATION>(LocalAlloc(LPTR, Length));
             if (Information == nullptr) {
                 Status = STATUS_NO_MEMORY;
                 break;
@@ -910,11 +909,11 @@ HRESULT WINAPI MUSA_NAME(GetThreadDescription)(
                 break;
             }
 
-            RtlFreeHeap(GetProcessHeap(), 0, Information);
+            LocalFree(Information);
         }
 
         if (!NT_SUCCESS(Status)) {
-            RtlFreeHeap(GetProcessHeap(), 0, Information);
+            LocalFree(Information);
             break;
         }
 
